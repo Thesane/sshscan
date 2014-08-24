@@ -7,7 +7,6 @@ how to install
 - then `make clean;make`
 
 how to use
-`./sshscan -H IP_FILE -U USERS_FILE -P PASSWORDS_FILE -t PORT -T THREADS_COUNT`
+`./sshscan -H IP_FILE -U USERS_FILE -t PORT -T THREADS_COUNT`
 
-Note: 
-- best practice to use threads count as no more than 10 x IPs count so the it won't waste processing power lost over failed connection to the IP because of limit of new connections
+success log will be created into the current working directory with the following format "YYYYMMDD-hhmmss.success.log"
