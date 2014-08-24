@@ -157,7 +157,7 @@ int pool_check_state(void)
 	{
 		if (pool->thread_unite_list[i].state == RUNNING)
 		{
-			pthread_mutex_unlock(&(pool->queue_lock));
+		  	pthread_mutex_unlock(&(pool->queue_lock));
 			return 1;
 		}
 	}

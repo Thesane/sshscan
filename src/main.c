@@ -1,5 +1,4 @@
 /*
- *	Power BY Bill Lonely
  * 	Updated by Ahmed Saber
  */
 #include <unistd.h>   
@@ -13,7 +12,6 @@
 Setting setting;
 struct ip_list IP_List;
 struct user_list User_List;
-struct password_list Pwd_List;
 int recive = 0;
 
 /*SIGINT*/
@@ -28,7 +26,6 @@ void ouch(int sig)
     
     free_ip_list(&IP_List);
     free_user_list(&User_List);
-    free_password_list(&Pwd_List);
     free_setting(&setting);
     sleep(2);
     printf("END! BYE.......\n");
@@ -37,16 +34,11 @@ void ouch(int sig)
 
 void show_help(void)
 {
-	printf("-h Host IP\n");
 	printf("-H Host File\n");
-	printf("-u UserName\n");
 	printf("-U User File\n");
-	printf("-p password\n");
-	printf("-P Password File\n");
 	printf("-t port\n");
 	printf("-T threads count\n");
 	printf("-D Log file\n");
-	printf("-N Password Group Number\n");
 	
 }
 
@@ -63,12 +55,14 @@ int main(int argc, char **argv)
 	show_help();
 	return 0;
     }
+    
     if (checkSetting(argc, argv, &setting) < 0)
     {
         fprintf(stderr, "Options Error \n");
         return -1;
     }
-    if (analysisSetting(&setting, &IP_List, &User_List, &Pwd_List) < 0)
+    
+    if (analysisSetting(&setting, &IP_List, &User_List) < 0)
     {
         return -1;
     }
@@ -77,7 +71,7 @@ int main(int argc, char **argv)
     {
         free_ip_list(&IP_List);
         free_user_list(&User_List);
-        free_password_list(&Pwd_List);
+        
         free_setting(&setting);
         return -1;
     }
@@ -86,7 +80,6 @@ int main(int argc, char **argv)
     {
 	free_ip_list(&IP_List);
         free_user_list(&User_List);
-        free_password_list(&Pwd_List);
         free_setting(&setting);
 		fprintf(stderr,"Init thread pool error!!\n");
 		return -2;
@@ -98,7 +91,6 @@ int main(int argc, char **argv)
     if (rc != 0) {
         free_ip_list(&IP_List);
         free_user_list(&User_List);
-        free_password_list(&Pwd_List);
         free_setting(&setting);
         fprintf (stderr, "libssh2 initialization failed (%d)\n", rc);       
 
@@ -112,7 +104,6 @@ int main(int argc, char **argv)
     {
         free_ip_list(&IP_List);
         free_user_list(&User_List);
-        free_password_list(&Pwd_List);
         free_setting(&setting);;
      
         return -1;
@@ -138,7 +129,6 @@ int main(int argc, char **argv)
     {
         workarg[i].port  = setting.port;
         workarg[i].users = User_List;
-        workarg[i].passwords = Pwd_List;
         workarg[i].ip = *pIP;
         workarg[i].setting = &setting;
 
@@ -158,7 +148,6 @@ int main(int argc, char **argv)
         libssh2_exit();
         free_ip_list(&IP_List);
         free_user_list(&User_List);
-        free_password_list(&Pwd_List);
         free_setting(&setting);
 	
     }

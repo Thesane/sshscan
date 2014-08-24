@@ -24,12 +24,8 @@
 #define MAX_LEN_PATH    2048
 typedef  struct _Setting
 {
-    char *Host_IP;
     char *Host_File;
-    char *Username;
     char *User_File;
-    char *Password;
-    char *Password_File;
     short port;
     int     connect_test_count;   
     char success_log_filename[MAX_LEN_PATH];  
@@ -57,6 +53,7 @@ struct ip_list
 struct user_node
 {
     char *user;
+    char *password;
     struct user_node *next;
 };
 struct user_list
@@ -65,47 +62,26 @@ struct user_list
     int count;
 };
 
-struct password_node
-{
-    char *password;
-    struct password_node *next;
-};
-
-struct password_list
-{
-    struct password_node *head;
-    int count;
-};
-
 /*Level 1*/
 struct Test_ssh_Arg_by_IP
 {
     struct ip_node ip;
     struct user_list users;
-    struct password_list passwords;  
     int ret;
     short port;    
-    Setting *setting;
-};
-
-/*Level 2*/
-struct Try_login_arg_by_user
-{
-    char *ip;
-    char *user;
-    short port;
-    struct password_list *passwords;
-    int complete;
-    pthread_mutex_t complete_mutex;  
-    int ret;
     Setting *setting;
 };
 
 /*Level 3*/
 struct Try_login_arg_by_pwd
 {
-    struct Try_login_arg_by_user *lastLevArg;
-    struct password_node *passwords;
+    char *ip;
+    char *user;
+    short port;
+    char *password;
+    int complete;
+    pthread_mutex_t complete_mutex;  
+    Setting *setting;
     int ret;
 };
 
@@ -120,12 +96,10 @@ void* ssh_test(void *arg);
 int checkSetting(int argc, char **argv, Setting *setting);
 void free_setting(Setting *setting);
 int analysisSetting(Setting *setting, struct ip_list *IPs, 
-        struct user_list *Users, struct password_list *Passwords);
+        struct user_list *Users);
 void free_ip_list(struct ip_list *IPs);
 void free_user_list(struct user_list *Users);
-void free_password_list(struct password_list *Passwords);
 void* try_login_pwd(void *arg);
-void* try_login_user(void *arg);
 
 int test_connect(char *ip, short port, int test_count);
 
