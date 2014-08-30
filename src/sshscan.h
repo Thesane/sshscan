@@ -22,6 +22,8 @@
 
 
 #define MAX_LEN_PATH    2048
+#include <list>
+using namespace std;
 typedef  struct _Setting
 {
     char *Host_File;
@@ -36,7 +38,7 @@ typedef  struct _Setting
     int per_pwd_num;     
     struct workarg_queue *workarg_list_head ;
     int pwd_group_num;  
-    int thread_num;  
+    unsigned int thread_num;  
 }Setting;
 
 struct ip_node
@@ -62,15 +64,6 @@ struct user_list
     int count;
 };
 
-/*Level 1*/
-struct Test_ssh_Arg_by_IP
-{
-    struct ip_node ip;
-    struct user_list users;
-    int ret;
-    short port;    
-    Setting *setting;
-};
 
 /*Level 3*/
 struct Try_login_arg_by_pwd
@@ -82,6 +75,7 @@ struct Try_login_arg_by_pwd
     int complete;
     pthread_mutex_t complete_mutex;  
     Setting *setting;
+    list<pthread_t> *thread_list;
     int ret;
 };
 
@@ -92,7 +86,11 @@ struct workarg_queue
     struct workarg_queue *next;
 };
 
-void* ssh_test(void *arg);
+struct threads
+{
+  pthread_t *pThread;
+  struct threads *next;
+};
 int checkSetting(int argc, char **argv, Setting *setting);
 void free_setting(Setting *setting);
 int analysisSetting(Setting *setting, struct ip_list *IPs, 
@@ -100,8 +98,6 @@ int analysisSetting(Setting *setting, struct ip_list *IPs,
 void free_ip_list(struct ip_list *IPs);
 void free_user_list(struct user_list *Users);
 void* try_login_pwd(void *arg);
-
-int test_connect(char *ip, short port, int test_count);
 
 
 #endif

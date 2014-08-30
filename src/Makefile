@@ -4,7 +4,7 @@
 all : sshscan
 
 # Which compiler
-CC = gcc
+CC = g++
 
 # Where are include files kept
 INCLUDE=.
@@ -19,17 +19,15 @@ MYLIB = mylib.a
 
 RM=rm -rf
 
-sshscan : main.o sshscan.o thread_pool.o gcrypt-fix.o
-	$(CC) $(CFLAGS) -o sshscan main.o sshscan.o thread_pool.o gcrypt-fix.o -lpthread -lssh2 -lgcrypt
+sshscan : main.o sshscan.o gcrypt-fix.o
+	$(CC) $(CFLAGS) -o sshscan main.o sshscan.o gcrypt-fix.o -lpthread -lssh2 -lgcrypt
 
-main.o : main.c
-	$(CC) -I$(INCLUDE) $(CFLAGS)  -c main.c
-sshscan.o : sshscan.h sshscan.c 
-	$(CC) -I$(INCLUDE) $(CFLAGS)  -c sshscan.c 
-thread_pool.o : thread_pool.c thread_pool.h
-	$(CC) -I$(INCLUDE) $(CFLAGS)  -c thread_pool.c 
-gcrypt-fix.o : gcrypt-fix.c gcrypt-fix.h
-	$(CC) -I$(INCLUDE) $(CFLAGS)  -c gcrypt-fix.c 
+main.o : main.cpp
+	$(CC) -I$(INCLUDE) $(CFLAGS)  -c main.cpp
+sshscan.o : sshscan.h sshscan.cpp 
+	$(CC) -I$(INCLUDE) $(CFLAGS)  -c sshscan.cpp 
+gcrypt-fix.o : gcrypt-fix.cpp gcrypt-fix.h
+	$(CC) -I$(INCLUDE) $(CFLAGS)  -c gcrypt-fix.cpp 
 
 clean-all: clean clean-bin
 
