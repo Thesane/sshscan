@@ -16,7 +16,8 @@ struct ip_list IP_List;
 struct user_list User_List;
 int recive = 0;
 list<pthread_t> thread_list;
-
+pthread_mutex_t list_mutex;
+pthread_mutex_t file_mutex;
 
 /*SIGINT*/
 void ouch(int sig)
@@ -126,7 +127,7 @@ int main(int argc, char **argv)
 
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
-    printf ( "Start Current local time and date: %s", asctime (timeinfo) );    
+    printf ( "Start Current local time and date: %s\n", asctime (timeinfo) );    
     pUser = User_List.head;
     for (i = 0; i < User_List.count; ++i)
     {
@@ -138,6 +139,7 @@ int main(int argc, char **argv)
 	      
 		sleep(2);
 	    }
+	    
 	   pthread_t temp_thread;
 	     struct Try_login_arg_by_pwd * pWorkarg_node = new Try_login_arg_by_pwd();
 	     
@@ -147,19 +149,18 @@ int main(int argc, char **argv)
 	  pWorkarg_node->ip = (*pIP).ip;
 	  pWorkarg_node->setting = &setting;
 	  pWorkarg_node->thread_list = &thread_list;
-	pWorkarg_node->complete = 0;
-	pthread_mutex_init(&pWorkarg_node->complete_mutex, NULL);
 	
 	  pthread_create(&temp_thread,NULL,&try_login_pwd,(void *)  pWorkarg_node);
-	  //pthread_join(temp_thread, NULL);
+	  pthread_mutex_lock(&setting.complete_mutex);
+	  printf("");
 	  thread_list.push_back(temp_thread);
-	  
-	  /*try_login_pwd(&workarg[j + (i*IP_List.count)]);*/
+	  pthread_mutex_unlock(&setting.complete_mutex);
+    	  
 	  pIP = pIP->next; 
 	  
 	         
 	}
-	sleep(2);
+// 	sleep(1);
 	pUser = pUser->next;
       
     }

@@ -33,6 +33,7 @@ typedef  struct _Setting
     char success_log_filename[MAX_LEN_PATH];  
     char path_log[MAX_LEN_PATH];  
     pthread_mutex_t success_log_mutex;  
+    pthread_mutex_t complete_mutex; 
     pthread_mutex_t setting_mutex;  
     struct password_node **pwd_groups; 
     int per_pwd_num;     
@@ -73,7 +74,6 @@ struct Try_login_arg_by_pwd
     short port;
     char *password;
     int complete;
-    pthread_mutex_t complete_mutex;  
     Setting *setting;
     list<pthread_t> *thread_list;
     int ret;
