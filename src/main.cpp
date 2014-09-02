@@ -127,17 +127,20 @@ int main(int argc, char **argv)
 
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
-    printf ( "Start Current local time and date: %s\n", asctime (timeinfo) );    
-    pUser = User_List.head;
-    for (i = 0; i < User_List.count; ++i)
+    printf ( "Start Current local time and date: %s\n", asctime (timeinfo) );  
+//     int max_conn = 0;
+    pIP = IP_List.head;
+    
+    for (j = 0; j < IP_List.count; ++j)
     {
-	pIP = IP_List.head;
-	for (j = 0; j < IP_List.count; ++j)
+	 pUser = User_List.head;
+   
+	  for (i = 0; i < User_List.count; ++i)
 	{
 	  while (thread_list.size() >= setting.thread_num)
 	    {
 	      
-		sleep(2);
+		sleep(1);
 	    }
 	    
 	   pthread_t temp_thread;
@@ -152,19 +155,21 @@ int main(int argc, char **argv)
 	
 	  pthread_create(&temp_thread,NULL,&try_login_pwd,(void *)  pWorkarg_node);
 	  pthread_mutex_lock(&setting.complete_mutex);
-	  printf("");
+// 	  printf("");
 	  thread_list.push_back(temp_thread);
 	  pthread_mutex_unlock(&setting.complete_mutex);
-    	  
-	  pIP = pIP->next; 
-	  
+//     	  if(max_conn++ > 9)
+// 	  {
+// 	    sleep(1);
+// 	    max_conn = 0;
+// 	  }
+	  pUser = pUser->next;
 	         
 	}
-// 	sleep(1);
-	pUser = pUser->next;
+	pIP = pIP->next;
+	
       
     }
-    sleep(2);
     
     while (thread_list.size() > 0)
     {

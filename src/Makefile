@@ -10,9 +10,9 @@ CC = g++
 INCLUDE=.
 
 # Options for development
-CFLAGS = -g -Wall -ansi
+#CFLAGS = -g -Wall -ansi
 # Opetion for release
-#CFLAGS = -O -Wall -ansi
+CFLAGS = -Wall -ansi -Wno-maybe-uninitialized
 
 # Local Libraries
 MYLIB = mylib.a
