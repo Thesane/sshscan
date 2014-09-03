@@ -29,7 +29,7 @@ void* try_login_pwd(void *arg)
   
   count_num = 0;
   flag_connect_success = 0;
-  
+  try_again:
   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
   {
     perror("socket() error:");
@@ -47,6 +47,7 @@ void* try_login_pwd(void *arg)
   if (setsockopt (sockfd, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout,
     sizeof(timeout)) < 0)
     printf("setsockopt failed\n");
+  
   for (i = 1; i <= parg->setting->connect_test_count; ++i)
   {
     if (connect(sockfd, (struct sockaddr *)(&address), sizeof(address)) == 0)
@@ -54,7 +55,8 @@ void* try_login_pwd(void *arg)
       flag_connect_success = 1;
       break;            
     }     
-    sleep(rand() % 3 + 1);
+    
+    sleep(rand() % 2 + 1);
   }
   
   if (flag_connect_success == 0)
@@ -62,9 +64,20 @@ void* try_login_pwd(void *arg)
     parg->ret = -2;
     close(sockfd);
     count_num++;
-    goto exit_it;
+    if(count_num < 3)
+    {
+      sleep(5);
+       goto try_again;
+    }
+     
+    else
+    {
+      printf("connect to %s failed\n",parg->ip);
+      goto exit_it;
+    }
+    
   }
-  count_num = 0;
+  
   session = libssh2_session_init();gcrypt_fix();
   libssh2_session_set_timeout(session,2000);
   if (libssh2_session_handshake(session, sockfd))
@@ -75,7 +88,19 @@ void* try_login_pwd(void *arg)
     
     close(sockfd);
     parg->ret = -1;
-    goto exit_it;
+    count_num++;
+    if(count_num < 6)
+    {
+      sleep(10);
+       goto try_again;
+    }
+     
+    else
+    {
+      printf("handshake %s failed\n",parg->ip);
+      goto exit_it;
+    }
+    
   }
   userauthlist = libssh2_userauth_list(session, parg->user, strlen(parg->user));
   if(userauthlist == NULL)
@@ -84,6 +109,7 @@ void* try_login_pwd(void *arg)
 			       "Normal Shutdown, Thank you for playing");
     libssh2_session_free(session);
     close(sockfd); 
+    
     goto exit_it;
   }
   if (strstr(userauthlist, "password") != NULL) {
@@ -146,7 +172,7 @@ void* try_login_pwd(void *arg)
       
     }
     pthread_mutex_unlock(&(parg->setting->complete_mutex));
-//     printf("thread#%lu exited\n",pthread_self());
+//     printf("ip %s user %s password %s\n",parg->ip,parg->user,parg->password);
     pthread_exit(0);
     return NULL;
   }
@@ -176,7 +202,7 @@ int checkSetting(int argc, char **argv, Setting *setting)
   setting->User_File = NULL;
   setting->port = 22;     
   setting->workarg_list_head = NULL;
-  setting->connect_test_count = 3;  
+  setting->connect_test_count = 2;  
   setting->thread_num = 6;  
   
   home_path = getenv("PWD");  
