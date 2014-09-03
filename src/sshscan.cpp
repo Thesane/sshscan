@@ -54,7 +54,7 @@ void* try_login_pwd(void *arg)
       flag_connect_success = 1;
       break;            
     }     
-    sleep(2);
+    sleep(rand() % 3 + 1);
   }
   
   if (flag_connect_success == 0)
@@ -176,7 +176,7 @@ int checkSetting(int argc, char **argv, Setting *setting)
   setting->User_File = NULL;
   setting->port = 22;     
   setting->workarg_list_head = NULL;
-  setting->connect_test_count = 2;  
+  setting->connect_test_count = 3;  
   setting->thread_num = 6;  
   
   home_path = getenv("PWD");  
