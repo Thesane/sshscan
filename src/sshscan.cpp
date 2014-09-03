@@ -72,7 +72,7 @@ void* try_login_pwd(void *arg)
      
     else
     {
-      printf("connect to %s failed\n",parg->ip);
+//       printf("connect to %s failed\n",parg->ip);
       goto exit_it;
     }
     
@@ -97,7 +97,7 @@ void* try_login_pwd(void *arg)
      
     else
     {
-      printf("handshake %s failed\n",parg->ip);
+//       printf("handshake %s failed\n",parg->ip);
       goto exit_it;
     }
     
