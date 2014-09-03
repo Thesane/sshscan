@@ -14,7 +14,7 @@ void* try_login_pwd(void *arg)
   int flag_connect_success = 0;
   int i;
   /*, j;*/
-  int count_num,auth_pw = 0;
+  int count_num,h_count_num,auth_pw = 0;
   LIBSSH2_SESSION *session;
   char *userauthlist;
   struct Try_login_arg_by_pwd *parg = (struct Try_login_arg_by_pwd *)arg;
@@ -28,6 +28,7 @@ void* try_login_pwd(void *arg)
   
   
   count_num = 0;
+  h_count_num = 0;
   flag_connect_success = 0;
   try_again:
   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -56,7 +57,7 @@ void* try_login_pwd(void *arg)
       break;            
     }     
     
-    sleep(rand() % 2 + 1);
+    sleep(5);
   }
   
   if (flag_connect_success == 0)
@@ -66,7 +67,6 @@ void* try_login_pwd(void *arg)
     count_num++;
     if(count_num < 3)
     {
-      sleep(5);
        goto try_again;
     }
      
@@ -88,10 +88,10 @@ void* try_login_pwd(void *arg)
     
     close(sockfd);
     parg->ret = -1;
-    count_num++;
-    if(count_num < 6)
+    h_count_num++;
+    if(h_count_num < 6)
     {
-      sleep(10);
+      sleep(15);
        goto try_again;
     }
      
