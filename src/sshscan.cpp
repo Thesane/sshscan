@@ -89,9 +89,9 @@ void* try_login_pwd(void *arg)
     close(sockfd);
     parg->ret = -1;
     h_count_num++;
-    if(h_count_num < 6)
+    if(h_count_num < 4)
     {
-      sleep(15);
+      sleep(10);
        goto try_again;
     }
      
