@@ -20,7 +20,16 @@ void* try_login_pwd(void *arg)
   struct Try_login_arg_by_pwd *parg = (struct Try_login_arg_by_pwd *)arg;
   struct sockaddr_in address;
   FILE *fp;
-  
+  //printf("current %i,%i,%i,%i,%i  %i %s\n",(*parg->conn_cnt)[0],(*parg->conn_cnt)[1],(*parg->conn_cnt)[2],(*parg->conn_cnt)[3],(*parg->conn_cnt)[4],parg->ip_ind,parg->ip);
+  while((*parg->conn_cnt)[parg->ip_ind] > 8)
+  {
+    //printf("waiting for max_conn %i for ip %s\n",(*parg->conn_cnt),parg->ip);
+    sleep(1);
+  }
+  pthread_mutex_lock(&(parg->setting->complete_mutex));
+  (*parg->conn_cnt)[parg->ip_ind]++;
+  pthread_mutex_unlock(&(parg->setting->complete_mutex));
+      
   memset(&address, 0, sizeof(address));
   address.sin_family = AF_INET;
   address.sin_port = htons(parg->port);
@@ -57,7 +66,7 @@ void* try_login_pwd(void *arg)
       break;            
     }     
     
-    sleep(5);
+    sleep(2);
   }
   
   if (flag_connect_success == 0)
@@ -65,8 +74,9 @@ void* try_login_pwd(void *arg)
     parg->ret = -2;
     close(sockfd);
     count_num++;
-    if(count_num < 3)
+    if(count_num < 2)
     {
+	sleep( 2);
        goto try_again;
     }
      
@@ -89,9 +99,8 @@ void* try_login_pwd(void *arg)
     close(sockfd);
     parg->ret = -1;
     h_count_num++;
-    if(h_count_num < 4)
+    if(h_count_num < 2)
     {
-      sleep(10);
        goto try_again;
     }
      
@@ -160,17 +169,8 @@ void* try_login_pwd(void *arg)
     pthread_mutex_unlock(&(parg->setting->success_log_mutex));
     exit_it:
     pthread_mutex_lock(&(parg->setting->complete_mutex));
-    
-    list<pthread_t>::iterator iter;
-    for(iter=parg->thread_list->begin();iter!= parg->thread_list->end();++iter)
-    {
-      if((*iter) == pthread_self())
-      {
-	parg->thread_list->remove((*iter));
-	break;
-      }
-      
-    }
+    parg->thread_list->remove(pthread_self());
+	  (*parg->conn_cnt)[parg->ip_ind]--;
     pthread_mutex_unlock(&(parg->setting->complete_mutex));
 //     printf("ip %s user %s password %s\n",parg->ip,parg->user,parg->password);
     pthread_exit(0);

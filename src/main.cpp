@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <time.h>
 #include <list>
+#include <vector>
 
 using namespace std;
 
@@ -18,7 +19,8 @@ int recive = 0;
 list<pthread_t> thread_list;
 pthread_mutex_t list_mutex;
 pthread_mutex_t file_mutex;
-
+vector<int> ip_conn;
+  
 /*SIGINT*/
 void ouch(int sig)
 {   
@@ -50,7 +52,6 @@ int main(int argc, char **argv)
 {
   int i,j, rc;
   struct Try_login_arg_by_pwd *workarg = NULL;
-  
   struct ip_node  *pIP = NULL;
   struct user_node *pUser = NULL;
   struct  workarg_queue *record_node = NULL;
@@ -128,20 +129,19 @@ int main(int argc, char **argv)
   time ( &rawtime );
   timeinfo = localtime ( &rawtime );
   printf ( "Start Current local time and date: %s\n", asctime (timeinfo) );  
-  //     int max_conn = 0;
   pUser = User_List.head;
-  
+  //int max_conn = 0;
+  ip_conn = vector<int>(IP_List.count,0);
   for (i = 0; i < User_List.count; ++i)
   {
-    
     pIP = IP_List.head;
-    
     for (j = 0; j < IP_List.count; ++j)
     {
+  
       while (thread_list.size() >= setting.thread_num)
       {
 	
-	sleep(1);
+	     sleep(1);
       }
       
       pthread_t temp_thread;
@@ -153,23 +153,21 @@ int main(int argc, char **argv)
       pWorkarg_node->ip = (*pIP).ip;
       pWorkarg_node->setting = &setting;
       pWorkarg_node->thread_list = &thread_list;
-      
+      pWorkarg_node->conn_cnt = &ip_conn;
+      pWorkarg_node->ip_ind = j;
       pthread_create(&temp_thread,NULL,&try_login_pwd,(void *)  pWorkarg_node);
       pthread_mutex_lock(&setting.complete_mutex);
-      // 	  printf("");
       thread_list.push_back(temp_thread);
       pthread_mutex_unlock(&setting.complete_mutex);
-      //     	  if(max_conn++ > 5)
-      // 	  {
-      // 	    sleep(1);
-      // 	    max_conn = 0;
-      // 	  }
+      
+      
+      
       pIP = pIP->next;
       
       
     }
-//     sleep(1);
     pUser = pUser->next;
+     
     
     
   }

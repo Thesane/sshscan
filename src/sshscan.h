@@ -23,6 +23,7 @@
 
 #define MAX_LEN_PATH    2048
 #include <list>
+#include <vector>
 using namespace std;
 typedef  struct _Setting
 {
@@ -74,6 +75,8 @@ struct Try_login_arg_by_pwd
     short port;
     char *password;
     int complete;
+    vector<int> *conn_cnt;
+    int ip_ind;
     Setting *setting;
     list<pthread_t> *thread_list;
     int ret;
